@@ -30,7 +30,7 @@ def process_song_data(spark,input_data,output_data):
     songs_table.write.mode("overwrite").parquet(output_data + 'songs')
     
     artists_fields=["artist_id", "artist_name as name", "artist_location as location", "artist_latitude as latitude","artist_longitude as longitude"]
-    artists_table=df.select(artists_fields).dropDuplicates()
+    artists_table=df.selectExpr(artists_fields).dropDuplicates()
     artists_table.write.mode("overwrite").parquet(output_data + 'artists')
 
 def process_log_data(spark,input_data,output_data):
@@ -75,3 +75,15 @@ def process_log_data(spark,input_data,output_data):
     ).repartition("year", "month")
 
     songplays_table.write.mode("overwrite").partitionBy("year", "month").parquet(output_data +'songplays')
+
+
+def main():
+
+    spark= create_spark_session()
+    input_data="/FileStore/tables/Data"
+    output_data="/FileStore/tables/NewData/"
+    process_song_data(spark,input_data,output_data)
+    process_log_data(spark,input_data,output_data)
+
+if __name__=="__main__":
+  main()
